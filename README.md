@@ -8,6 +8,21 @@ Make command-line todo lists available in multiple locations.
 - On another computer
 - In another directory
 
+`todo config`
+-----------
+
+`todo` (alias `todo init`)
+---------
+
+- or `todo <name>`
+
+`todo rm`
+----------
+
+- or `todo rm <name>`
+
+
+
 Setup
 -----------
 
@@ -28,13 +43,7 @@ Use
 
 curl
 
-Notes
-------------
-
-Probably want to use a fuse file-ish thing
-GO's looks like the most stable/well-worn
-
 License
 -------------
 
-Apache 2.0 of course
+Apache 2.0
