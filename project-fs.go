@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,11 +16,33 @@ import (
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 )
 
-type HelloFs struct {
+type ProjectFs struct {
 	pathfs.FileSystem
 }
 
-func (me *HelloFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
+type test_struct struct {
+	Id string
+}
+
+func (me *ProjectFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
+	resp, err := http.Get("http://localhost:3333/projects/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	decoder := json.NewDecoder(resp.Body)
+	var t []test_struct
+	errr := decoder.Decode(&t)
+	if errr != nil {
+		log.Fatal(errr)
+	}
+	for _, b := range t {
+		if b.Id == name {
+			return &fuse.Attr{
+				Mode: fuse.S_IFREG | 0644, Size: uint64(len(name)),
+			}, fuse.OK
+		}
+	}
+
 	switch name {
 	case "file.txt":
 		return &fuse.Attr{
@@ -30,22 +56,48 @@ func (me *HelloFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse
 	return nil, fuse.ENOENT
 }
 
-func (me *HelloFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry, code fuse.Status) {
+func (me *ProjectFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry, code fuse.Status) {
+	resp, err := http.Get("http://localhost:3333/projects/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	decoder := json.NewDecoder(resp.Body)
+	var t []test_struct
+	errr := decoder.Decode(&t)
+	if errr != nil {
+		log.Fatal(errr)
+	}
+
 	if name == "" {
-		c = []fuse.DirEntry{{Name: "file.txt", Mode: fuse.S_IFREG}}
+		c := []fuse.DirEntry{}
+		for i := range t {
+			log.Println(t[i].Id)
+			c = append(c, fuse.DirEntry{Name: t[i].Id, Mode: fuse.S_IFREG})
+		}
+
+		// {{Name: "file.txt", Mode: fuse.S_IFREG}}
 		return c, fuse.OK
 	}
 	return nil, fuse.ENOENT
 }
 
-func (me *HelloFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	if name != "file.txt" {
-		return nil, fuse.ENOENT
-	}
+func (me *ProjectFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
 	if flags&fuse.O_ANYWRITE != 0 {
 		return nil, fuse.EPERM
 	}
-	return nodefs.NewDataFile([]byte(name)), fuse.OK
+
+	resp, err := http.Get("http://localhost:3333/projects/" + name)
+	if err != nil {
+		return nil, fuse.EPERM
+	}
+
+	defer resp.Body.Close()
+	body, errr := ioutil.ReadAll(resp.Body)
+	if errr != nil {
+		return nil, fuse.EPERM
+	}
+
+	return nodefs.NewDataFile([]byte(body)), fuse.OK
 }
 
 func main() {
@@ -53,12 +105,12 @@ func main() {
 	// Check args
 	flag.Parse()
 	if len(flag.Args()) < 1 {
-		log.Fatal("Usage:\n  hello MOUNTPOINT")
+		log.Fatal("Usage:\n  project-fs MOUNTPOINT")
 	}
 
 	// Load file system
 	log.Println("Loading file system...")
-	nfs := pathfs.NewPathNodeFs(&HelloFs{FileSystem: pathfs.NewDefaultFileSystem()}, nil)
+	nfs := pathfs.NewPathNodeFs(&ProjectFs{FileSystem: pathfs.NewDefaultFileSystem()}, nil)
 	server, _, err := nodefs.MountRoot(flag.Arg(0), nfs.Root(), nil)
 	if err != nil {
 		log.Fatalf("Mount fail: %v\n", err)
@@ -67,7 +119,7 @@ func main() {
 	go func() {
 		server.Serve()
 	}()
-	log.Println("(after serve)")
+	log.Println("File system loaded.")
 
 	// Clean 'errything up when I get SIGINT'd
 	c := make(chan os.Signal, 1)
@@ -78,7 +130,7 @@ func main() {
 	go func() {
 		sig := <-c
 
-		log.Printf("captured %v\n", sig)
+		log.Printf("Captured %v\n", sig)
 		log.Println("Unmounting file system...")
 
 		server.Unmount()

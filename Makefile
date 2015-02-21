@@ -1,6 +1,6 @@
 
 build:
-	echo "Nothing to bulid"
+	go run ./project-fs.go "`pwd`/mnt"
 
 install:
 	echo "No install script written :("
@@ -11,5 +11,5 @@ install-deps:
 	export GOPATH=`pwd` && go get ./...
 
 force-unmount:
-	# sudo umount -l <path>
+	sudo umount -l "`pwd`/mnt"
 
