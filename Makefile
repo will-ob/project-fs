@@ -1,6 +1,7 @@
 
+# Where GOPATH is an env var ~/projects/go-workspace
 build:
-	go run ./project-fs.go "`pwd`/mnt"
+	cd "$$GOPATH" && go run src/github.com/will-ob/todo/main/*go src/github.com/will-ob/todo/mnt
 
 install:
 	echo "No install script written :("
@@ -11,5 +12,5 @@ install-deps:
 	export GOPATH=`pwd` && go get ./...
 
 force-unmount:
-	sudo umount -l "`pwd`/mnt"
+	cd "$$GOPATH" && sudo umount -l src/github.com/will-ob/todo/mnt
 
