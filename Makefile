@@ -3,6 +3,9 @@
 build:
 	cd "$$GOPATH" && go run src/github.com/will-ob/todo/main/*go src/github.com/will-ob/todo/mnt
 
+buildbuild:
+	go build ./main/*.go
+
 install:
 	echo "No install script written :("
 

@@ -1,12 +1,17 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
+
+type ProjectStore struct {
+}
 
 type ProjectJson struct {
 	Id string
@@ -22,26 +27,36 @@ func check(err error) {
 	}
 }
 
-func GetProjectJsonIndex() *ProjectJsonCollection {
-	pj := ProjectJsonCollection{Json: []ProjectJson{}}
-	resp, err := http.Get("http://localhost:3333/projects/")
+func getHttp(addr string) (r *http.Response) {
+	var err error
+	var resp *http.Response
+	if os.Getenv("TLS_UNSAFE") == "true" {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport: tr}
+		resp, err = client.Get(addr)
+	} else {
+		resp, err = http.Get(addr)
+	}
 	check(err)
+	return resp
+}
+
+func (me *ProjectStore) GetJsonIndex() *ProjectJsonCollection {
+	pj := ProjectJsonCollection{Json: []ProjectJson{}}
+	resp := getHttp(os.Getenv("PROJECT_API_URL") + "/v1/projects/")
 	decoder := json.NewDecoder(resp.Body)
-	errr := decoder.Decode(&pj.Json)
-	check(errr)
+	err := decoder.Decode(&pj.Json)
+	check(err)
 	return &pj
 }
 
-func GetProjectMarkdown(id string) ([]byte, error) {
-	resp, err := http.Get("http://localhost:3333/projects/" + id)
-	check(err)
-	if err != nil {
-		return nil, errors.New("Could not retrieve markdown body")
-	}
-
+func (me *ProjectStore) GetMarkdown(id string) ([]byte, error) {
+	resp := getHttp(os.Getenv("PROJECT_API_URL") + "/v1/projects/" + id)
 	defer resp.Body.Close()
-	body, errr := ioutil.ReadAll(resp.Body)
-	if errr != nil {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return nil, errors.New("Could not read markdown body")
 	}
 	return []byte(body), nil

@@ -2,6 +2,16 @@
 `todo`
 =========
 
+Environment
+---------------------
+
+| Var  | Required  | Description | Example |
+|---|:-:|---|---|
+| `PROJECT_API_URL`     | x | Url of project api | `http://localhost:3333/projects/`  |
+| `UNSAFE_TLS`     |   | Ignore certificate errors (eg. from self-signed dev certs) | `true`  |
+
+
+
 Make command-line todo lists available in multiple locations.
 
 - On the internets
