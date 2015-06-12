@@ -30,7 +30,7 @@ func check(err error) {
 func getHttp(addr string) (r *http.Response) {
 	var err error
 	var resp *http.Response
-	if os.Getenv("TLS_UNSAFE") == "true" {
+	if os.Getenv("UNSAFE_TLS") == "true" {
 		tr := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}

@@ -1,0 +1,14 @@
+[Unit]
+Description=Project Filesystem
+
+[Service]
+TimeoutStartSec=0
+Environment="PROJECT_API_URL=https://api.f7ops.dev"
+Environment="UNSAFE_TLS=true"
+ExecStartPre=-/bin/mkdir -p %h/.projectfs/mnt
+ExecStartPre=-/bin/umount -l %h/.projectfs/mnt
+ExecStart=/opt/project-fs/projectfs %h/.projectfs/mnt
+ExecStopPost=sudo umount -l %h/projectfs/mnt
+
+[Install]
+WantedBy=multi-user.target

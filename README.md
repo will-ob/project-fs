@@ -1,6 +1,8 @@
 
-`todo`
+Project FS
 =========
+
+Markdown todo-lists sync'd online
 
 Environment
 ---------------------
@@ -11,12 +13,20 @@ Environment
 | `UNSAFE_TLS`     |   | Ignore certificate errors (eg. from self-signed dev certs) | `true`  |
 
 
+Paths
+-------------
+
+
+| Path  | Contents |
+|---|---|
+| `/opt/project-fs`  | Binary executable |
+| `/home/<user>/.project-fs` | User configuration & file cache |
+| `/usr/local/bin/todo` | `ln -s => /opt/project-fs/todo`|
+| `/var/log/project-fs.log` | Log file of fuse backend. (Note: `todo` cmd logs to stdout and stderr)|
+
 
 Make command-line todo lists available in multiple locations.
 
-- On the internets
-- On another computer
-- In another directory
 
 `todo config`
 -----------
@@ -33,7 +43,6 @@ Make command-line todo lists available in multiple locations.
 
 
 
-Setup
 -----------
 
 make install

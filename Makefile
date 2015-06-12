@@ -1,19 +1,21 @@
+current_dir=$(shell pwd)
 
-# Where GOPATH is an env var ~/projects/go-workspace
-build:
-	cd "$$GOPATH" && go run src/github.com/will-ob/todo/main/*go src/github.com/will-ob/todo/mnt
+build: clean
+	go build -o target/projectfs ./main/*.go
 
-buildbuild:
-	go build ./main/*.go
+clean:
+	rm -rf target
 
-install:
-	echo "No install script written :("
+install: uninstall build
+	$(current_dir)/tools/install.sh
 
 uninstall:
+	$(current_dir)/tools/uninstall.sh
 
 install-deps:
 	export GOPATH=`pwd` && go get ./...
 
 force-unmount:
-	cd "$$GOPATH" && sudo umount -l src/github.com/will-ob/todo/mnt
+	sudo umount -l ./mnt
 
+.PHONY: build clean install uninstall install-deps force-unmount
