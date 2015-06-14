@@ -10,5 +10,8 @@ sudo rm -rf /opt/project-fs
 # Dangling references
 sudo rm -f /usr/local/bin/todo
 
+# Remove user data
+rm -rf ~/.projectfs
+
 echo -e "\n\nUninstall Complete\nTa"
 
