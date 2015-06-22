@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+cat <<EOF
+Starting project-fs configuration tool...
+
+This tool will configure your project-fs daemon.
+Only the basic options are configured. Sane defaults are in (parenthesis).
+
+EOF
+
+# PROJECT_API_URL
+read -e -p "Project API: (https://api.f7ops.com) " project_api
+project_api=${project_api:-"https://api.f7ops.com"}
+
+cat <<EOF > ~/.projectfs/env
+# Attached Resources
+PROJECT_API_URL=$project_api
+
+# Settings
+UNSAFE_TLS=$unsafe_tls
+
+EOF
+

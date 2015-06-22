@@ -5,6 +5,7 @@ Description=Project Filesystem
 TimeoutStartSec=0
 Environment="PROJECT_API_URL=https://api.f7ops.dev"
 Environment="UNSAFE_TLS=true"
+EnvironmentFile=-%h/.projectfs/env
 ExecStartPre=-/bin/mkdir -p %h/.projectfs/mnt
 ExecStartPre=-/bin/umount -l %h/.projectfs/mnt
 ExecStart=/opt/project-fs/projectfs %h/.projectfs/mnt
