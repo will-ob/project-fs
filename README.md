@@ -1,10 +1,41 @@
 Project FS
 =========
 
-Markdown todo-lists sync'd online
+Markdown todo-lists, sync'd online.
 
-Environment
----------------------
+Make command-line todo lists available in multiple locations.
+
+Install
+------------
+
+```
+git clone git@github.com:will-ob/project-fs.git && cd project-fs
+make install
+```
+
+Uninstall
+-------------
+
+```
+make uninstall
+```
+
+Commands
+---------------
+
+| Command  | Description  |
+|---|---|
+| `todo`  | Find or create todo list for current directory.|
+| `todo <name>` | Open named todo list. |
+| `todo config` | Configure the project-fs daemon. |
+| `todo rm` | Delete todo list in current directory. |
+| `todo rm <name>` | Delete named todo list. |
+
+
+Development
+--------------------
+
+### Environment
 
 | Var  | Required  | Description | Example |
 |---|:-:|---|---|
@@ -12,54 +43,14 @@ Environment
 | `UNSAFE_TLS`     |   | Ignore certificate errors (eg. from self-signed dev certs) | `true`  |
 
 
-Paths
--------------
-
+### Paths
 
 | Path  | Contents |
 |---|---|
 | `/opt/project-fs`  | Binary executable |
 | `/home/<user>/.project-fs` | User configuration & file cache |
 | `/usr/local/bin/todo` | `ln -s => /opt/project-fs/todo`|
-| `/var/log/project-fs.log` | Log file of fuse backend. (Note: `todo` cmd logs to stdout and stderr)|
-
-
-Make command-line todo lists available in multiple locations.
-
-
-`todo config`
------------
-
-`todo` (alias `todo init`)
----------
-
-- or `todo <name>`
-
-`todo rm`
-----------
-
-- or `todo rm <name>`
-
-
-
------------
-
-make install
-  - list
-  - of
-  - .rcfile-param prompts
-
-Use
---------
-
-    todo init <filename>
-    todo <filename>
-
-(img of $EDITOR open)
-
-~~ save ~~
-
-curl
+| `/var/log/project-fs.log` | Log file of daemon (filesystem backend). (Note: `todo` cmd logs to stdout and stderr, not this file.)|
 
 License
 -------------
