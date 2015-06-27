@@ -1,10 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
+	"github.com/gregjones/httpcache"
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 	"log"
+	"net/http"
+	"os"
 )
 
 type ProjectFs struct {
@@ -12,10 +16,25 @@ type ProjectFs struct {
 	ProjectStore ProjectStore
 }
 
+func NewProjectStore() ProjectStore {
+	var tr *http.Transport
+	if os.Getenv("UNSAFE_TLS") == "true" {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{}
+	}
+	cachedTr := httpcache.NewMemoryCacheTransport()
+	cachedTr.Transport = tr
+	ps := ProjectStore{Transport: cachedTr}
+	return ps
+}
+
 func MountDefaultProjectFs(path string) (*fuse.Server, error) {
 	nfs := pathfs.NewPathNodeFs(&ProjectFs{
 		FileSystem:   pathfs.NewDefaultFileSystem(),
-		ProjectStore: ProjectStore{},
+		ProjectStore: NewProjectStore(),
 	}, nil)
 	server, _, err := nodefs.MountRoot(path, nfs.Root(), nil)
 	if err != nil {
@@ -26,6 +45,7 @@ func MountDefaultProjectFs(path string) (*fuse.Server, error) {
 }
 
 func (me *ProjectFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
+	// stat a particular file
 	for _, b := range me.ProjectStore.GetJsonIndex().Json {
 		if b.Id == name {
 			return &fuse.Attr{
@@ -34,6 +54,7 @@ func (me *ProjectFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fu
 		}
 	}
 
+	// stat the directory
 	if name == "" {
 		return &fuse.Attr{
 			Mode: fuse.S_IFDIR | 0755,

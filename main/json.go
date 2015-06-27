@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -12,6 +11,7 @@ import (
 )
 
 type ProjectStore struct {
+	Transport http.RoundTripper
 }
 
 type ProjectJson struct {
@@ -30,26 +30,23 @@ func check(err error) {
 	}
 }
 
-func getHttp(addr string) (r *http.Response) {
+func (me *ProjectStore) getHttp(addr string, header http.Header) (r *http.Response) {
 	var err error
 	var resp *http.Response
-	if os.Getenv("UNSAFE_TLS") == "true" {
-		tr := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		client := &http.Client{Transport: tr}
-		resp, err = client.Get(addr)
-	} else {
-		resp, err = http.Get(addr)
-	}
+	client := &http.Client{Transport: me.Transport}
+	req, err := http.NewRequest("GET", addr, nil)
 	check(err)
+	req.Header = header
+	req.Header.Add("X-API-Key", os.Getenv("PROJECT_API_TOKEN"))
+	resp, errr := client.Do(req)
+	check(errr)
 	return resp
 }
 
 func (me *ProjectStore) GetJsonIndex() *ProjectJsonCollection {
 	log.Println("Get " + os.Getenv("PROJECT_API_URL") + "/v0.1/projects")
 	pj := ProjectJsonCollection{Json: []ProjectJson{}}
-	resp := getHttp(os.Getenv("PROJECT_API_URL") + "/v0.1/projects")
+	resp := me.getHttp(os.Getenv("PROJECT_API_URL")+"/v0.1/projects", map[string][]string{})
 	// Need to check for error response, if not error, json decode.
 	defer resp.Body.Close()
 	switch resp.StatusCode {
@@ -71,7 +68,7 @@ func (me *ProjectStore) GetJsonIndex() *ProjectJsonCollection {
 }
 
 func (me *ProjectStore) GetMarkdown(id string) ([]byte, error) {
-	resp := getHttp(os.Getenv("PROJECT_API_URL") + "/v0.1/projects" + id)
+	resp := me.getHttp(os.Getenv("PROJECT_API_URL")+"/v0.1/projects/"+id+"/content", map[string][]string{"Accept": {"text/markdown"}})
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
