@@ -13,6 +13,12 @@ git clone git@github.com:will-ob/project-fs.git && cd project-fs
 make install
 ```
 
+Then:
+
+```
+todo config
+```
+
 Uninstall
 -------------
 
@@ -25,10 +31,14 @@ Commands
 
 | Command  | Description  |
 |---|---|
-| `todo`  | Find or create todo list for current directory.|
-| `todo <name>` | Open named todo list. |
+| `todo`  | Open todo list for current directory. |
 | `todo config` | Configure the project-fs daemon. |
-| `todo rm` | Delete todo list in current directory. |
+| `todo init`  | Create a new todo list in the current directory. |
+| `todo init <name> `| Link to existing todo list in the current directory. |
+| `todo ls`  | List available todos. |
+| `todo name`  | Print the name of the todo list in the current directory. |
+| `todo <name>` | Open named todo list. |
+| `todo rm` | Remove todo list reference in current directory. |
 | `todo rm <name>` | Delete named todo list. |
 
 
@@ -47,9 +57,9 @@ Development
 
 | Path  | Contents |
 |---|---|
-| `/opt/project-fs`  | Binary executable |
-| `/home/<user>/.project-fs` | User configuration & file cache |
-| `/usr/local/bin/todo` | `ln -s => /opt/project-fs/todo`|
+| `/opt/project-fs`  | System-wide binaries and bash tools. |
+| `/home/<user>/.project-fs` | User configuration and mount point. |
+| `/usr/local/bin/todo` | `ln -s => /opt/project-fs/todo` |
 | `/var/log/project-fs.log` | Log file of daemon (filesystem backend). (Note: `todo` cmd logs to stdout and stderr, not this file.)|
 
 License
