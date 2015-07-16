@@ -37,7 +37,7 @@ func (me *ProjectStore) getHttp(addr string, header http.Header) (r *http.Respon
 	req, err := http.NewRequest("GET", addr, nil)
 	check(err)
 	req.Header = header
-	req.Header.Add("X-API-Key", os.Getenv("PROJECT_API_TOKEN"))
+	req.Header.Add("X-API-Key", os.Getenv("PROJECT_API_KEY"))
 	resp, errr := client.Do(req)
 	check(errr)
 	return resp

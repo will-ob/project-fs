@@ -50,6 +50,7 @@ Development
 | Var  | Required  | Description | Example |
 |---|:-:|---|---|
 | `PROJECT_API_URL`     | x | Url of project api | `http://localhost:3333/projects/`  |
+| `PROJECT_API_KEY`     | x | Valid API token. | `1643tej8qdfqsgm70b7hb5554riptbuvvnukp8pha8fnf3lgbv1e`  |
 | `UNSAFE_TLS`     |   | Ignore certificate errors (eg. from self-signed dev certs) | `true`  |
 
 
@@ -61,6 +62,8 @@ Development
 | `/home/<user>/.project-fs` | User configuration and mount point. |
 | `/usr/local/bin/todo` | `ln -s => /opt/project-fs/todo` |
 | `/var/log/project-fs.log` | Log file of daemon (filesystem backend). (Note: `todo` cmd logs to stdout and stderr, not this file.)|
+
+
 
 License
 -------------
