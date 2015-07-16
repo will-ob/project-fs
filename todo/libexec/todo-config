@@ -27,3 +27,5 @@ EOF
 
 chmod 400 ~/.projectfs/env
 
+systemctl --user restart project-fs.service
+

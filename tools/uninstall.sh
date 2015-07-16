@@ -11,6 +11,7 @@ sudo rm -rf /opt/project-fs
 sudo rm -f /usr/local/bin/todo
 
 # Remove user data
+sudo umount -l ~/.projectfs/mnt
 rm -rf ~/.projectfs
 
 echo -e "\n\nUninstall Complete\nTa"
