@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -28,6 +29,20 @@ func check(err error) {
 		debug.PrintStack()
 		log.Fatal(err)
 	}
+}
+
+func (me *ProjectStore) putHttp(addr string, header http.Header, body *[]byte) (r *http.Response) {
+	var err error
+	var resp *http.Response
+	client := &http.Client{Transport: me.Transport}
+	log.Println("Put: " + string((*body)[:]))
+	req, err := http.NewRequest("PUT", addr, bytes.NewReader(*body))
+	check(err)
+	req.Header = header
+	req.Header.Add("X-API-Key", os.Getenv("PROJECT_API_KEY"))
+	resp, errr := client.Do(req)
+	check(errr)
+	return resp
 }
 
 func (me *ProjectStore) getHttp(addr string, header http.Header) (r *http.Response) {
@@ -69,6 +84,16 @@ func (me *ProjectStore) GetJsonIndex() *ProjectJsonCollection {
 
 func (me *ProjectStore) GetMarkdown(id string) ([]byte, error) {
 	resp := me.getHttp(os.Getenv("PROJECT_API_URL")+"/v0.1/projects/"+id+"/content", map[string][]string{"Accept": {"text/markdown"}})
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.New("Could not read markdown body")
+	}
+	return []byte(body), nil
+}
+
+func (me *ProjectStore) SetMarkdown(id string, data *[]byte) ([]byte, error) {
+	resp := me.putHttp(os.Getenv("PROJECT_API_URL")+"/v0.1/projects/"+id+"/content", map[string][]string{"content-type": {"text/markdown"}}, data)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

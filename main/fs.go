@@ -79,14 +79,14 @@ func (me *ProjectFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEn
 }
 
 func (me *ProjectFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	if flags&fuse.O_ANYWRITE != 0 {
-		return nil, fuse.EPERM
-	}
+	// if flags&fuse.O_ANYWRITE != 0 {
+	// 	return nil, fuse.EPERM
+	// }
 
 	body, err := me.ProjectStore.GetMarkdown(name)
 	if err != nil {
 		return nil, fuse.EPERM
 	}
 
-	return nodefs.NewDataFile([]byte(body)), fuse.OK
+	return NewProjectFile([]byte(body), &me.ProjectStore, name), fuse.OK
 }
