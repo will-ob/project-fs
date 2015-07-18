@@ -1,0 +1,11 @@
+#!/usr/bin/env bats
+
+# TODO: has summary
+# TODO: has description
+# TODO: has help
+
+# TODO: If symlink to project todo exists, delete it
+# TODO: If symlink to elsewhere exists, don't delete it
+# TODO: If regular file exists, do not delete it
+# TODO: Actual project should not be deleted on server
+

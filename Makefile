@@ -1,6 +1,6 @@
 current_dir=$(shell pwd)
 
-build: clean install-deps
+build: clean
 	go build -o target/projectfs ./main/*.go
 
 clean:
@@ -18,4 +18,8 @@ install-deps:
 force-unmount:
 	sudo umount -l ./mnt
 
-.PHONY: build clean install uninstall install-deps force-unmount
+test:
+	$(current_dir)/tools/test.sh
+
+
+.PHONY: build clean install uninstall install-deps force-unmount test

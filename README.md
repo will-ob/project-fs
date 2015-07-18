@@ -53,6 +53,13 @@ Development
 | `PROJECT_API_KEY`     | x | Valid API token. | `1643tej8qdfqsgm70b7hb5554riptbuvvnukp8pha8fnf3lgbv1e`  |
 | `UNSAFE_TLS`     |   | Ignore certificate errors (eg. from self-signed dev certs) | `true`  |
 
+### Testing
+
+Must have [bats](https://github.com/sstephenson/bats) available on the command line for testing.
+
+To test the `todo` command, run `make test`. 
+
+
 
 ### Paths
 

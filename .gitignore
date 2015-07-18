@@ -2,4 +2,4 @@
 target/
 src/
 mnt/
-.env
+.env*

@@ -1,0 +1,49 @@
+#!/usr/bin/env bats -p
+
+source .env.test
+load test-helpers
+
+@test "'todo -h' prints help" {
+  output=$(todo -h)
+  [[ $output =~ "Usage:" ]]
+}
+
+@test "'todo --help' prints help" {
+  output=$(todo --help)
+  [[ $output =~ "Usage:" ]]
+}
+
+
+@test "'todo' when .todo exists, opens it for editing" {
+  export EDITOR="vim -s commands"
+
+  # Create project and link
+  rm -f test/fixtures/exists/.todo
+  createProject
+  ln -s $(find ~/.projectfs/mnt/* | head -1) \
+        test/fixtures/exists/.todo
+
+  $( cd test/fixtures/exists/; todo; )
+
+  # Expect .todo to eq expected
+  diff -q test/fixtures/exists/.todo \
+          test/fixtures/exists/expected
+}
+
+@test "'todo' when .todo exists, but links elsewhere, warns, does not open" {
+  export EDITOR=$(exit 1)
+  $( cd test/fixtures/wrong-sym/; todo; )
+}
+
+@test "'todo' when .todo does not exist, does not create a new project" {
+  export EDITOR="vim -s commands"
+  output=$( cd test/fixtures/empty/; todo; )
+  [[ $output =~ "Create one with 'todo init'" ]]
+  [[ ! -f test/fixtures/empty/.todo ]]
+}
+
+@test "'todo' when .todo is actual file, warns, does not open" {
+  skip
+}
+
+

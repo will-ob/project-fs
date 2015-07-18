@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# TODO - if config exists, overwrite?
+config_path=~/.projectfs/env
+
+if [ -f $config_path ];
+then
+  read -e -p "Configuration exists. Overwrite? " overwrite
+  if [[ ! $overwrite =~ ^[Yy]$ ]]
+  then
+    exit 0
+  fi
+fi
+
+rm -f $config_path
+
 cat <<EOF
 Starting project-fs configuration tool...
 
@@ -15,7 +29,7 @@ project_api=${project_api:-"https://api.f7ops.com"}
 # PROJECT_API_KEY
 read -e -p "Project API Key: " project_api_key
 
-cat <<EOF > ~/.projectfs/env
+cat <<EOF > $config_path
 # Attached Resources
 PROJECT_API_URL=$project_api
 PROJECT_API_KEY=$project_api_key
@@ -25,7 +39,7 @@ UNSAFE_TLS=$unsafe_tls
 
 EOF
 
-chmod 400 ~/.projectfs/env
+chmod 400 $config_path
 
 systemctl --user restart project-fs.service
 
