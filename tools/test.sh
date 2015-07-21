@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-source fs-control.sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source $DIR/fs-control.sh
 
 existingFsStop
 testFsStart
