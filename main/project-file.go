@@ -47,7 +47,6 @@ func (f *projectFile) Read(buf []byte, off int64) (fuse.ReadResult, fuse.Status)
 
 func (f *projectFile) Write(data []byte, off int64) (uint32, fuse.Status) {
 	log.Println("Writing file...")
-	log.Println(data)
 	var err error
 	_, err = f.store.SetMarkdown(f.name, &data)
 	if err != nil {

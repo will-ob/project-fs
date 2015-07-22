@@ -11,14 +11,20 @@ import (
 	"net/http"
 	"os"
 	"runtime/debug"
+	"time"
 )
 
 type ProjectStore struct {
+	// This project store is an http api,
+	//   it has a Transport that caches http responses
+	//   when the appropriate headers exist
 	Transport http.RoundTripper
 }
 
 type ProjectJson struct {
-	Id string
+	Id      string
+	Updated time.Time `json:"updated_at"`
+	Created time.Time `json:"created_at"`
 }
 
 type ProjectJsonCollection struct {

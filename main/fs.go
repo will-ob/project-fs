@@ -27,11 +27,14 @@ func MountDefaultProjectFs(path string) (*fuse.Server, error) {
 
 func (me *ProjectFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
 	// stat a particular file
-	for _, b := range me.ProjectStore.GetJsonIndex().Json {
-		if b.Id == name {
-			return &fuse.Attr{
+	for _, proj := range me.ProjectStore.GetJsonIndex().Json {
+		if proj.Id == name {
+			attrs := &fuse.Attr{
 				Mode: fuse.S_IFREG | 0644, Size: uint64(len(name)),
-			}, fuse.OK
+			}
+			attrs.SetTimes(&proj.Created, &proj.Updated, &proj.Updated)
+
+			return attrs, fuse.OK
 		}
 	}
 
