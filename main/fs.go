@@ -1,34 +1,15 @@
 package main
 
 import (
-	"crypto/tls"
-	"github.com/gregjones/httpcache"
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 	"log"
-	"net/http"
-	"os"
 )
 
 type ProjectFs struct {
 	pathfs.FileSystem
 	ProjectStore ProjectStore
-}
-
-func NewProjectStore() ProjectStore {
-	var tr *http.Transport
-	if os.Getenv("UNSAFE_TLS") == "true" {
-		tr = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		tr = &http.Transport{}
-	}
-	cachedTr := httpcache.NewMemoryCacheTransport()
-	cachedTr.Transport = tr
-	ps := ProjectStore{Transport: cachedTr}
-	return ps
 }
 
 func MountDefaultProjectFs(path string) (*fuse.Server, error) {
@@ -79,10 +60,6 @@ func (me *ProjectFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEn
 }
 
 func (me *ProjectFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	// if flags&fuse.O_ANYWRITE != 0 {
-	// 	return nil, fuse.EPERM
-	// }
-
 	body, err := me.ProjectStore.GetMarkdown(name)
 	if err != nil {
 		return nil, fuse.EPERM

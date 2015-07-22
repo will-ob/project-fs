@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"github.com/gregjones/httpcache"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,6 +23,21 @@ type ProjectJson struct {
 
 type ProjectJsonCollection struct {
 	Json []ProjectJson
+}
+
+func NewProjectStore() ProjectStore {
+	var tr *http.Transport
+	if os.Getenv("UNSAFE_TLS") == "true" {
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		tr = &http.Transport{}
+	}
+	cachedTr := httpcache.NewMemoryCacheTransport()
+	cachedTr.Transport = tr
+	ps := ProjectStore{Transport: cachedTr}
+	return ps
 }
 
 func check(err error) {
