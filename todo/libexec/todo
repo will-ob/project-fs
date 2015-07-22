@@ -25,7 +25,32 @@ export PATH="${libexec_path}:$PATH"
 
 command="$1"
 case "$command" in
-"" | "-h" | "--help" )
+"" )
+  # TODO - actually open link, or say no todo exists
+  echo "Searching for todo..."
+  todo_path=`pwd`/.todo
+  if [ -L $todo_path ]; then
+    # Symlink exists, target exists
+    if [ -z ${EDITOR+x} ]; then
+      echo "EDITOR not set. Defaulting to vim"
+      vim `pwd`/.todo
+    else
+      echo "EDITOR set to '$EDITOR'"
+      $EDITOR `pwd`/.todo
+    fi
+  elif [ -h $todo_path ]; then
+    # Symlink exists, target does not
+    echo "Todo file exists but could not be opened"
+  elif [ -f $todo_path ]; then
+    # Regular file exists
+    echo "$todo_path is not a recognized todo-list"
+  else
+    # no file exists
+    echo -e "This directory does not have a todo list.\nCreate one with 'todo init'"
+  fi
+  ;;
+
+"-h" | "--help" )
   exec todo-help
   ;;
 * )

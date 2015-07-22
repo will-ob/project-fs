@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: todo ls
+# Summary: Display a list of all available todos
+# Help: This command is used to look up the names of various todo lists for use in other commands (todo rm <name>, todo init <name>, etc)
+
+# TODO - print list of available todo lists (id & name)
+
+echo "Error: 'todo-ls' not implemented."

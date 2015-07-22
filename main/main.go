@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"runtime"
 
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 )
 
 func main() {
+	runtime.GOMAXPROCS(2)
 
 	// Check args
 	flag.Parse()

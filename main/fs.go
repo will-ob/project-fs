@@ -15,7 +15,7 @@ type ProjectFs struct {
 func MountDefaultProjectFs(path string) (*fuse.Server, error) {
 	nfs := pathfs.NewPathNodeFs(&ProjectFs{
 		FileSystem:   pathfs.NewDefaultFileSystem(),
-		ProjectStore: ProjectStore{},
+		ProjectStore: NewProjectStore(),
 	}, nil)
 	server, _, err := nodefs.MountRoot(path, nfs.Root(), nil)
 	if err != nil {
@@ -26,14 +26,19 @@ func MountDefaultProjectFs(path string) (*fuse.Server, error) {
 }
 
 func (me *ProjectFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
-	for _, b := range me.ProjectStore.GetJsonIndex().Json {
-		if b.Id == name {
-			return &fuse.Attr{
+	// stat a particular file
+	for _, proj := range me.ProjectStore.GetJsonIndex().Json {
+		if proj.Id == name {
+			attrs := &fuse.Attr{
 				Mode: fuse.S_IFREG | 0644, Size: uint64(len(name)),
-			}, fuse.OK
+			}
+			attrs.SetTimes(&proj.Created, &proj.Updated, &proj.Updated)
+
+			return attrs, fuse.OK
 		}
 	}
 
+	// stat the directory
 	if name == "" {
 		return &fuse.Attr{
 			Mode: fuse.S_IFDIR | 0755,
@@ -58,14 +63,10 @@ func (me *ProjectFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEn
 }
 
 func (me *ProjectFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	if flags&fuse.O_ANYWRITE != 0 {
-		return nil, fuse.EPERM
-	}
-
 	body, err := me.ProjectStore.GetMarkdown(name)
 	if err != nil {
 		return nil, fuse.EPERM
 	}
 
-	return nodefs.NewDataFile([]byte(body)), fuse.OK
+	return NewProjectFile([]byte(body), &me.ProjectStore, name), fuse.OK
 }

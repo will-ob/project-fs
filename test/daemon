@@ -1,0 +1,29 @@
+#!/usr/bin/env bats
+
+@test "'project-fs' prints usage" {
+  run /opt/project-fs/projectfs
+  [[ $output =~ "Usage" ]]
+}
+
+
+
+
+# TODO: fails with invalid project-api-url / key combination
+#   no url
+#   bad url
+#   slow url
+#   bad key
+#   no key
+
+## Reading
+
+# TODO: Displays all projects in mounted directory
+# TODO: Symlinks all named projects
+# TODO: Displays appropriate modified date of files
+
+## Writing
+
+# TODO: Permits writing when connected
+# TODO: Saves to temp-file when writes to server fail or timeout
+
+

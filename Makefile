@@ -13,9 +13,13 @@ uninstall:
 	$(current_dir)/tools/uninstall.sh
 
 install-deps:
-	export GOPATH=`pwd` && go get ./...
+	bash -c "export GOPATH=$(current_dir) && go get ./..." || true
 
 force-unmount:
 	sudo umount -l ./mnt
 
-.PHONY: build clean install uninstall install-deps force-unmount
+test:
+	$(current_dir)/tools/test.sh
+
+
+.PHONY: build clean install uninstall install-deps force-unmount test
