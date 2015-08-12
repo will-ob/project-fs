@@ -1,5 +1,8 @@
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 function createProject {
+  source $DIR/../.env.test
   curl 'https://api.f7ops.dev/v0.1/projects' \
     -X POST \
     -H 'content-length: 0' \
@@ -11,4 +14,4 @@ function createProject {
     --show-error
 }
 
-
+export PROJECT_DIR=$( realpath $DIR/.. )

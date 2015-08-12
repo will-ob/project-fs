@@ -15,24 +15,32 @@ load test-helpers
 
 
 @test "'todo' when .todo exists, opens it for editing" {
-  export EDITOR="vim -s commands"
+  export EDITOR="echo 'Hello World' > "
 
   # Create project and link
-  rm -f test/fixtures/exists/.todo
-  createProject
-  ln -s $(find ~/.projectfs/mnt/* | head -1) \
-        test/fixtures/exists/.todo
+  rm -f $PROJECT_DIR/test/fixtures/exists/.todo
+  id=$( createProject | jq -r '.id' )
+  ln -s "$HOME/.projectfs/mnt/$id" \
+        $PROJECT_DIR/test/fixtures/exists/.todo
 
-  $( cd test/fixtures/exists/; todo; )
+
+  { cd test/fixtures/exists/; todo; }
+
+  [ -h $PROJECT_DIR/test/fixtures/exists/.todo ]
+  cat $(realpath -m $PROJECT_DIR/test/fixtures/exists/.todo) 1>&2
 
   # Expect .todo to eq expected
-  diff -q test/fixtures/exists/.todo \
-          test/fixtures/exists/expected
+  diff $(realpath -m $PROJECT_DIR/test/fixtures/exists/.todo) \
+          $PROJECT_DIR/test/fixtures/exists/expected 1>&2
 }
 
 @test "'todo' when .todo exists, but links elsewhere, warns, does not open" {
-  export EDITOR=$(exit 1)
-  $( cd test/fixtures/wrong-sym/; todo; )
+  export EDITOR="exit 128;"
+  cd test/fixtures/wrong-sym/
+  run todo
+  cd ../../../
+  [[ $status -eq 1 ]]
+  [[ $output =~ ".todo is not a 'todo' project" ]]
 }
 
 @test "'todo' when .todo does not exist, does not create a new project" {

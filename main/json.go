@@ -18,7 +18,7 @@ type ProjectStore struct {
 	// This project store is an http api,
 	//   it has a Transport that caches http responses
 	//   when the appropriate headers exist
-	Transport http.RoundTripper
+	Transport *httpcache.Transport
 }
 
 type ProjectJson struct {
@@ -54,10 +54,14 @@ func check(err error) {
 	}
 }
 
+func (me *ProjectStore) ClearIndex() {
+	me.Transport.Cache.Delete(os.Getenv("PROJECT_API_URL") + "/v0.1/projects")
+}
+
 func (me *ProjectStore) putHttp(addr string, header http.Header, body *[]byte) (r *http.Response) {
 	var err error
 	var resp *http.Response
-	client := &http.Client{Transport: me.Transport}
+	client := &http.Client{Transport: me.Transport.Transport}
 	log.Println("Put: " + string((*body)[:]))
 	req, err := http.NewRequest("PUT", addr, bytes.NewReader(*body))
 	check(err)

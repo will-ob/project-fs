@@ -62,6 +62,16 @@ func (me *ProjectFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEn
 	return nil, fuse.ENOENT
 }
 
+func (me *ProjectFs) Create(name string, flags uint32, mode uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
+	me.ProjectStore.ClearIndex()
+	_, err := me.ProjectStore.GetMarkdown(name)
+	if err != nil {
+		return nil, fuse.EPERM
+	}
+
+	return NewProjectFile([]byte(""), &me.ProjectStore, name), fuse.OK
+}
+
 func (me *ProjectFs) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
 	body, err := me.ProjectStore.GetMarkdown(name)
 	if err != nil {

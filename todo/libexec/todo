@@ -30,13 +30,22 @@ case "$command" in
   echo "Searching for todo..."
   todo_path=`pwd`/.todo
   if [ -L $todo_path ]; then
+    # Symlink exists, does not point to projectfs
+    todo_dir=$(readlink $todo_path | xargs realpath | xargs dirname)
+    if [[ $todo_dir != $HOME/.projectfs/mnt ]]; then
+      echo ".todo is not a 'todo' project"
+      exit 1
+    fi
+
     # Symlink exists, target exists
     if [ -z ${EDITOR+x} ]; then
       echo "EDITOR not set. Defaulting to vim"
       vim `pwd`/.todo
     else
       echo "EDITOR set to '$EDITOR'"
-      $EDITOR `pwd`/.todo
+      cmd="$EDITOR `pwd`/.todo"
+      echo "$cmd"
+      eval "$cmd"
     fi
   elif [ -h $todo_path ]; then
     # Symlink exists, target does not
