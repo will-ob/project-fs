@@ -26,6 +26,17 @@ Uninstall
 make uninstall
 ```
 
+Env Vars
+----------
+
+The `todo` commands use the following env vars:
+
+| Env Var  | Description  |
+|---|---|
+| HOME  | Used to store user-specific program settings and data. |
+| EDITOR  | Used to determine which program should be used for editing todo lists. |
+
+
 Commands
 ---------------
 
