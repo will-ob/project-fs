@@ -4,7 +4,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 function runTest {
   echo -e "Running tests...\n"
-  find ./test/* -maxdepth 0 | xargs -I{} bash -c "bats -p {} || true"
+  find ./test/* -maxdepth 0 | xargs -I{} bash -c 'echo -e "\n\nRunning {}\n"; bats -p {} || true'
   echo -e "End of tests.\n"
 }
 
